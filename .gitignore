@@ -1,0 +1,45 @@
+# Variables de entorno (NUNCA subir)
+.env
+.env.local
+.env.production
+
+# Base de datos
+data/
+*.db
+*.sqlite3
+
+# Credenciales
+credentials/
+*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+dist/
+build/
+*.egg-info/
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    # Cambia la imagen a tu propio registro si usas GHCR o Docker Hub:
+    # image: ghcr.io/TU_USUARIO/bot-automatizaciones:latest
+    image: bot-automatizaciones:latest
+    container_name: bot-automatizaciones
+    restart: unless-stopped
+    ports:
+      - "8001:8000"   # Puerto externo: 8001 (cámbialo si ya está ocupado)
+    env_file:
+      - .env
+    volumes:
+      # Persistencia de la base de datos SQLite
+      - bot-automatizaciones-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  bot-automatizaciones-data:
