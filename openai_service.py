@@ -170,10 +170,15 @@ class OpenAIService:
                 {
                     "role": "system",
                     "content": (
-                        "Responde SOLO con 'SI' o 'NO'. "
-                        "¿El usuario quiere hablar con una persona real, un agente humano, "
-                        "o está expresando frustración clara y pide ser atendido por alguien? "
-                        "Considera también si el mensaje es abusivo, spam o completamente ilegible."
+                        "Responde SOLO con 'SI' o 'NO'.\n"
+                        "¿El usuario está pidiendo EXPLÍCITAMENTE hablar con una persona humana, "
+                        "un agente o un asesor real?\n"
+                        "Solo responde SI si usa frases muy claras como: 'quiero hablar con una persona', "
+                        "'ponme con alguien', 'quiero un agente humano', 'hablar con un asesor', "
+                        "'no quiero hablar con un bot'.\n"
+                        "Para cualquier otra cosa — preguntas, respuestas cortas, mensajes vagos, "
+                        "frustración leve — responde NO.\n"
+                        "En caso de duda, responde NO."
                     ),
                 }
             ]
