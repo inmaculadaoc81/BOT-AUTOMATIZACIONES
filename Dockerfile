@@ -11,7 +11,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY *.py ./
+COPY main.py config.py database.py openai_service.py chatwoot_service.py whatsapp_service.py calendar_service.py ./
 
 # Create persistent data directory for SQLite
 RUN mkdir -p data

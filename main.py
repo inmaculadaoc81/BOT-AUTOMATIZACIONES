@@ -1,5 +1,6 @@
 import logging
 import json
+import re
 from contextlib import asynccontextmanager
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -15,6 +16,7 @@ from database import Database
 from openai_service import OpenAIService
 from whatsapp_service import WhatsAppService
 from chatwoot_service import ChatwootService
+import calendar_service
 
 # ── Logging ────────────────────────────────────────────────────────────────────
 
@@ -125,6 +127,93 @@ async def _do_handoff(sender_key: str, conversation_id: int | None = None):
 
     await db.set_conversation_mode(sender_key, "human")
     logger.info(f"Handoff complete for {sender_key} (conv: {conversation_id})")
+
+
+# ── Meeting booking helper ────────────────────────────────────────────────────
+
+_REUNION_RE = re.compile(r"AGENDAR_REUNION:\s*(\{.*?\})", re.DOTALL)
+
+_DAYS_ES = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+_MONTHS_ES = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+]
+
+
+async def _handle_agendar_reunion(ai_response: str) -> tuple[str, str]:
+    """
+    Detect AGENDAR_REUNION in the AI response, create the calendar event,
+    and return (clean_message, confirmation_message).
+    """
+    match = _REUNION_RE.search(ai_response)
+    if not match:
+        return ai_response, ""
+
+    clean = ai_response[: match.start()].strip()
+
+    try:
+        data = json.loads(match.group(1))
+        nombre = data.get("nombre", "Cliente")
+        empresa = data.get("empresa", "")
+        fecha_iso = data.get("fecha_iso", "")
+        descripcion = data.get("descripcion", "")
+        email = data.get("email") or None
+
+        if not fecha_iso:
+            logger.warning("AGENDAR_REUNION found but no fecha_iso — skipping calendar")
+            return clean, ""
+
+        summary = f"Reunión {settings.BUSINESS_NAME} — {nombre}"
+        if empresa:
+            summary += f" ({empresa})"
+        full_desc = (
+            f"Cliente: {nombre}\n"
+            f"Empresa: {empresa}\n\n"
+            f"Procesos a automatizar:\n{descripcion}"
+        )
+
+        result = await calendar_service.create_meeting(
+            summary=summary,
+            description=full_desc,
+            start_iso=fecha_iso,
+            attendee_email=email,
+        )
+
+        dt = datetime.fromisoformat(fecha_iso)
+        fecha_str = (
+            f"{_DAYS_ES[dt.weekday()]} {dt.day} de "
+            f"{_MONTHS_ES[dt.month - 1]} a las {dt.strftime('%H:%M')}"
+        )
+
+        if result and result.get("meet_link"):
+            confirmation = (
+                f"✅ *¡Reunión confirmada!*\n"
+                f"📅 {fecha_str}\n"
+                f"⏱️ {settings.MEETING_DURATION_MINUTES} minutos\n"
+                f"🎥 {result['meet_link']}\n\n"
+                f"¡Hasta pronto! 😊"
+            )
+        elif result:
+            confirmation = (
+                f"✅ *¡Reunión confirmada!*\n"
+                f"📅 {fecha_str}\n"
+                f"⏱️ {settings.MEETING_DURATION_MINUTES} minutos\n\n"
+                f"¡Hasta pronto! 😊"
+            )
+        else:
+            confirmation = (
+                f"✅ *¡Reunión anotada!*\n"
+                f"📅 {fecha_str}\n\n"
+                f"Nuestro equipo te confirmará los detalles en breve. 😊"
+            )
+
+        logger.info(f"Meeting booked for {nombre} at {fecha_iso}")
+        return clean, confirmation
+
+    except Exception as e:
+        logger.error(f"Error handling AGENDAR_REUNION: {e}", exc_info=True)
+        clean = _REUNION_RE.sub("", ai_response).strip()
+        return clean, ""
 
 
 # ── Rate limit helper ─────────────────────────────────────────────────────────
@@ -265,6 +354,17 @@ async def receive_whatsapp_message(request: Request):
                 await db.save_message(sender, "assistant", msg)
                 await whatsapp_svc.send_message(to=sender, text=msg)
             return {"status": "handoff"}
+
+        # Detect meeting booking request
+        if "AGENDAR_REUNION:" in ai_response:
+            clean_msg, confirmation = await _handle_agendar_reunion(ai_response)
+            if clean_msg:
+                await db.save_message(sender, "assistant", clean_msg)
+                await whatsapp_svc.send_message(to=sender, text=clean_msg)
+            if confirmation:
+                await db.save_message(sender, "assistant", confirmation)
+                await whatsapp_svc.send_message(to=sender, text=confirmation)
+            return {"status": "meeting_booked"}
 
         # Send response
         await db.save_message(sender, "assistant", ai_response)
@@ -472,6 +572,17 @@ async def chatwoot_webhook(request: Request):
                 await db.save_message(sender_key, "assistant", msg)
                 await chatwoot_svc.send_message(conversation_id, msg)
             return {"status": "handoff"}
+
+        # Detect meeting booking request
+        if "AGENDAR_REUNION:" in ai_response:
+            clean_msg, confirmation = await _handle_agendar_reunion(ai_response)
+            if clean_msg:
+                await db.save_message(sender_key, "assistant", clean_msg)
+                await chatwoot_svc.send_message(conversation_id, clean_msg)
+            if confirmation:
+                await db.save_message(sender_key, "assistant", confirmation)
+                await chatwoot_svc.send_message(conversation_id, confirmation)
+            return {"status": "meeting_booked"}
 
         # Send response
         await db.save_message(sender_key, "assistant", ai_response)
