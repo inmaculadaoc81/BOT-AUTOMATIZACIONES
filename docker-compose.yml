@@ -1,9 +1,7 @@
 services:
   app:
     build: .
-    # Cambia la imagen a tu propio registro si usas GHCR o Docker Hub:
-    # image: ghcr.io/TU_USUARIO/bot-automatizaciones:latest
-    image: bot-automatizaciones:latest
+    image: ghcr.io/inmaculadaoc81/bot-automatizaciones:latest
     container_name: bot-automatizaciones
     restart: unless-stopped
     ports:
