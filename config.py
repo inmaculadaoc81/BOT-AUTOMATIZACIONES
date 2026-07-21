@@ -143,6 +143,9 @@ marketing digital. ¿En qué te puedo ayudar hoy? 😊"
     BUSINESS_NAME: str = "Automatizaciones"
     BOT_NAME: str = "Asistente"
 
+    # ── Versión desplegada (inyectada por el Dockerfile en build time) ────────
+    GIT_SHA: str = "unknown"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

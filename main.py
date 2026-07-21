@@ -142,6 +142,7 @@ async def health():
         "status": "ok",
         "service": f"{settings.BUSINESS_NAME} Bot",
         "bot": settings.BOT_NAME,
+        "commit": settings.GIT_SHA[:7],
     }
 
 
