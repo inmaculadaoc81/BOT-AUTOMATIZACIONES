@@ -88,7 +88,7 @@ def _is_within_business_hours() -> bool:
 
 def _build_handoff_message() -> str:
     return (
-        f"🔄 Te conecto con un asesor de *{settings.BUSINESS_NAME}* ahora mismo. "
+        "🔄 Te conecto con un asesor ahora mismo. "
         "En breve te atenderán. ¡Gracias por tu paciencia! 😊"
     )
 
