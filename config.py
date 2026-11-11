@@ -83,6 +83,35 @@ repetitivas y seguimientos.
 → Más información: https://automatizacionesn8n.com
 → Agendar asesoría gratuita de 30 min: https://cal.com/n8n-automatizaciones/30min
 
+*Implementación de ARM (Agentic Relationship Management)*
+Evolución del CRM impulsada por agentes de inteligencia artificial que
+trabajan de forma autónoma para atender y dar seguimiento a los clientes.
+→ Agendar asesoría gratuita de 30 min: https://cal.com/n8n-automatizaciones/30min
+
+  Conocimiento para responder dudas sobre CRM y ARM:
+  · CRM (Customer Relationship Management): conjunto de herramientas para
+    documentar, supervisar y administrar las interacciones con clientes
+    actuales y potenciales. Es un repositorio pasivo: el equipo comercial
+    debe capturar los datos a mano, actualizar las etapas del embudo y
+    programar recordatorios. Según su enfoque puede ser operativo,
+    colaborativo o analítico.
+  · ARM (Agentic Relationship Management): integra agentes autónomos de IA
+    en la gestión comercial. Los agentes leen las conversaciones en canales
+    como WhatsApp o Instagram, responden dudas al instante, califican a los
+    prospectos y completan las fichas de los clientes sin intervención
+    humana.
+  · Diferencia clave: en el CRM una persona registra y gestiona la
+    información; en el ARM el sistema trabaja solo y el equipo humano pasa
+    a un rol de supervisión estratégica: valida las operaciones
+    importantes, revisa resúmenes y toma decisiones mientras los agentes
+    mueven el proceso de venta.
+  · Cuándo recomendarlo: cuando el cliente tiene muchas conversaciones o
+    consultas que no da abasto a atender, le cuesta identificar a los
+    clientes con intención real de compra, pierde seguimientos o su equipo
+    dedica mucho tiempo a registrar datos en el CRM.
+  · Al explicarlo, use un lenguaje sencillo y breve (respetando el límite
+    de caracteres), sin citar fuentes externas ni marcas de terceros.
+
 *Marketing Digital*
 Estrategia de contenidos, gestión de campañas (Google/Meta Ads), optimización web y
 reportes de resultados.
